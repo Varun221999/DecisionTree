@@ -3,11 +3,8 @@ package com.jetbrains;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.math.*;
-import java.util.Scanner;
 
 public class Main {
 
@@ -22,6 +19,7 @@ public class Main {
     static ArrayList<String> Type = new ArrayList<>(10);
     static ArrayList<String> Est = new ArrayList<>(10);
     static ArrayList<String> WillWait = new ArrayList<>(10);
+    static double dataSetEntropy = 0.0;
     public static void main(String[] args) {
         // write your code here
         /*File Parsing Try-Catch*/
@@ -68,42 +66,43 @@ public class Main {
 
     /*TODO: Entropy Calculation*/
     static double entropy(){
-        //TODO: add return statements in cases itself.
+        dataSetEntropy = attribute_gain(WillWait);
         for(int i = 0; i <10; i++ ){
             switch (i) {
                 case 0:
-                     attribute_entropy(Pat); break; //TODO: Change back to Alt, Pat only for debugging purposes
+                     attribute_gain(Alt); break;
                 case 1:
-                    attribute_entropy(Bar); break;
+                    attribute_gain(Bar); break;
                 case 2:
-                    attribute_entropy(Fri); break;
+                    attribute_gain(Fri); break;
                 case 3:
-                    attribute_entropy(Hun); break;
+                    attribute_gain(Hun); break;
                 case 4:
-                    attribute_entropy(Pat); break;
+                    attribute_gain(Pat); break;
                 case 5:
-                    attribute_entropy(Price); break;
+                    attribute_gain(Price); break;
                 case 6:
-                    attribute_entropy(Rain); break;
+                    attribute_gain(Rain); break;
                 case 7:
-                    attribute_entropy(Res); break;
+                    attribute_gain(Res); break;
                 case 8:
-                    attribute_entropy(Type); break;
+                    attribute_gain(Type); break;
                 case 9:
-                    attribute_entropy(Est); break;
+                    attribute_gain(Est); break;
                 default:
                     break;
             }
         }
         return 0.0;
     }
-    static double attribute_entropy(ArrayList<String> att) {
+    static double attribute_gain(ArrayList<String> att) {
         Map<String, Integer> goalAchievedCount = new HashMap<>(); //Map to keep track of what sub Attribute has Yes as goal.
         Map<String, Integer> subAttributeCount = new HashMap<>(); //Map to keep track of different types of sub Attributes & their repetition count
         for (int i = 1; i < att.size(); i++) {
             if (subAttributeCount.containsKey(att.get(i))) {
                 subAttributeCount.put(att.get(i), subAttributeCount.get(att.get(i)) + 1);
-            } else {
+            }
+            else {
                 subAttributeCount.put(att.get(i), 1);
                 goalAchievedCount.put(att.get(i), 0);
             }
@@ -114,6 +113,7 @@ public class Main {
         } //for-loop end
 
         ArrayList<Double> subAttEntropy = new ArrayList<>();
+        ArrayList<Integer> subAttCountList = new ArrayList<>();
         double value = 0.0;
         int totalRep = 0;
         int success = 0;
@@ -126,20 +126,33 @@ public class Main {
             failure = totalRep - success;
 
             subAttEntropy.add(calculation(totalRep, success, failure));
-            //System.out.println(subAttEntropy.get(0));
+            subAttCountList.add(map.getValue());
         }
 
-        /*TODO: Calculate Attribute Entropy's*/
-        return 0.0;
+        /*TODO: Calculate Attribute Gain*/
+        int exampleCounts = att.size() - 1; // -1 becuase the 1st element of every attribute list is the title itself.
+        double gain = 0.0;
+
+        //        if(Objects.equals(att.get(0), "WillWait")){
+        //
+        //        }
+        for(int i = 0; i < subAttEntropy.size(); i++) {
+
+            gain += ( (double) subAttCountList.get(i) / (double) exampleCounts ) * (subAttEntropy.get(i)) ;
+        }
+            System.out.println(  att.get(0)+"  Gain: " + (1- gain));
+            return 1 - gain;
     }
 
     private static Double calculation(int totalRep, int success, int failure) {
-       double yes =  ( (double) success/ (double) totalRep);
-       double no =  ( (double) failure/ (double) totalRep);
-       double log1 = ( (yes) * ( Math.log(yes) /Math.log(2) ));
-       double log2 = ( (no)  * ( Math.log(no)  /Math.log(2) ));
-       double total = 0 - log1 - log2;
-       //double total =  0 - ( ((yes)*(Math.log(yes)/Math.log(2))) + ((no)*(Math.log(no)/Math.log(2))) ) ;
+        double logYes, logNo, total;
+        double yes =  ( (double) success/ (double) totalRep);
+        logYes = Math.log(yes) == Double.NEGATIVE_INFINITY ? 0.0 : ((yes) * (Math.log(yes) / Math.log(2)));
+
+        double no =  ( (double) failure/ (double) totalRep);
+        logNo = Math.log(no) == Double.NEGATIVE_INFINITY ? 0.0 : ((no) * (Math.log(no) / Math.log(2)));
+
+        total = 0 - logYes - logNo;
        return total;
     }
 }
