@@ -136,8 +136,10 @@ public class Main {
     private static Double calculation(int totalRep, int success, int failure) {
        double yes =  ( (double) success/ (double) totalRep);
        double no =  ( (double) failure/ (double) totalRep);
-       double total =  0 - ( ((yes)*(Math.log(yes)/Math.log(2))) + ((no)*(Math.log(no)/Math.log(2))) ) ;
+       double log1 = ( (yes) * ( Math.log(yes) /Math.log(2) ));
+       double log2 = ( (no)  * ( Math.log(no)  /Math.log(2) ));
+       double total = 0 - log1 - log2;
+       //double total =  0 - ( ((yes)*(Math.log(yes)/Math.log(2))) + ((no)*(Math.log(no)/Math.log(2))) ) ;
        return total;
-//        return  0.0;
     }
 }
