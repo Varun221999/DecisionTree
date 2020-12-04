@@ -6,6 +6,7 @@ import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.math.*;
 import java.util.Scanner;
 
 public class Main {
@@ -71,7 +72,7 @@ public class Main {
         for(int i = 0; i <10; i++ ){
             switch (i) {
                 case 0:
-                     attribute_entropy(Alt); break;
+                     attribute_entropy(Pat); break; //TODO: Change back to Alt, Pat only for debugging purposes
                 case 1:
                     attribute_entropy(Bar); break;
                 case 2:
@@ -96,22 +97,47 @@ public class Main {
         }
         return 0.0;
     }
-    static double attribute_entropy(ArrayList<String> att){
-        Map<String,Integer> goalAchievedCount = new HashMap<String,Integer>();
-        Map<String,Integer> subAttributeCount = new HashMap<String,Integer>();
-        for(int i = 1; i < att.size(); i++){
-          if(subAttributeCount.containsKey(att.get(i))){
-              subAttributeCount.put(att.get(i),subAttributeCount.get(att.get(i)) + 1);
-          }
-          else {
-              subAttributeCount.put(att.get(i), 1);
-              goalAchievedCount.put(att.get(i), 0);
-          }
+    static double attribute_entropy(ArrayList<String> att) {
+        Map<String, Integer> goalAchievedCount = new HashMap<>(); //Map to keep track of what sub Attribute has Yes as goal.
+        Map<String, Integer> subAttributeCount = new HashMap<>(); //Map to keep track of different types of sub Attributes & their repetition count
+        for (int i = 1; i < att.size(); i++) {
+            if (subAttributeCount.containsKey(att.get(i))) {
+                subAttributeCount.put(att.get(i), subAttributeCount.get(att.get(i)) + 1);
+            } else {
+                subAttributeCount.put(att.get(i), 1);
+                goalAchievedCount.put(att.get(i), 0);
+            }
 
-          if(WillWait.get(i).equals("Yes")){
-              goalAchievedCount.put(att.get(i),goalAchievedCount.get(att.get(i)) + 1);
-          }
+            if (WillWait.get(i).equals("Yes")) {
+                goalAchievedCount.put(att.get(i), goalAchievedCount.get(att.get(i)) + 1);
+            }
+        } //for-loop end
+
+        ArrayList<Double> subAttEntropy = new ArrayList<>();
+        double value = 0.0;
+        int totalRep = 0;
+        int success = 0;
+        int failure = 0;
+
+        /*TODO: Calculate Sub Attribute Entropy's*/
+        for (Map.Entry<String, Integer> map : subAttributeCount.entrySet()){
+            totalRep = map.getValue();
+            success = goalAchievedCount.get(map.getKey());
+            failure = totalRep - success;
+
+            subAttEntropy.add(calculation(totalRep, success, failure));
+            //System.out.println(subAttEntropy.get(0));
         }
+
+        /*TODO: Calculate Attribute Entropy's*/
         return 0.0;
+    }
+
+    private static Double calculation(int totalRep, int success, int failure) {
+       double yes =  ( (double) success/ (double) totalRep);
+       double no =  ( (double) failure/ (double) totalRep);
+       double total =  0 - ( ((yes)*(Math.log(yes)/Math.log(2))) + ((no)*(Math.log(no)/Math.log(2))) ) ;
+       return total;
+//        return  0.0;
     }
 }
